@@ -1,1 +1,3 @@
-# SEI-CAFE
+# Virtual Karaoke React Project
+## General Assembly Unit 4
+
