@@ -1,24 +1,26 @@
-import NavBar from "../NavBar/NavBar"
-import { useState } from "react";
+import NavBar from "../NavBar/NavBar";
 import { Link } from "react-router-dom";
-import './Header.css';
 
 export default function Header({ user, setUser }) {
-    const [loggedIn, setLoggedIn] = useState({user}); // need to figure out getUser()
-
     return (
-        <div className="header-full">
-            <div className="header">
-                <span id="logo">
+        <header className="bg-white shadow-md">
+            <div className="container mx-auto flex justify-between items-center py-4 px-6">
+                <span id="logo" className="text-2xl font-bold text-gray-900">
                     LOGO HERE
                 </span>
                 <NavBar user={user} setUser={setUser} />
-                <span id="right-button">
-                    {loggedIn ? <Link to="/">SING NOW</Link> : <Link to="/authpage">LOGIN</Link>}
-                </span>
+                <div id="right-button">
+                    {user ? (
+                        <Link to="/" className="text-white bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg">
+                            SING NOW
+                        </Link>
+                    ) : (
+                        <Link to="/authpage" className="text-blue-500 hover:text-blue-600">
+                            LOGIN
+                        </Link>
+                    )}
+                </div>
             </div>
-        </div>
-
-
-    )
+        </header>
+    );
 }

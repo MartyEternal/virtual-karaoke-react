@@ -24,14 +24,15 @@ app.use(require('./config/checkToken'));
 const port = process.env.PORT || 3001;
 
 // Put API routes here, before the "catch all" route
+app.use('/api/rooms', require('./routes/api/rooms'));
 app.use('/api/users', require('./routes/api/users'));
 
 // The following "catch all" route (note the *) is necessary
 // to return the index.html on all non-AJAX/API requests
-app.get('/*', function(req, res) {
+app.get('/*', function (req, res) {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-app.listen(port, function() {
+app.listen(port, function () {
   console.log(`Express app running on port ${port}`);
 });

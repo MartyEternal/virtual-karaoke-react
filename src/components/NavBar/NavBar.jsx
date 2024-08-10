@@ -1,10 +1,7 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
 import * as userService from '../../utilities/users-service';
-import { getUser } from '../../utilities/users-service';
 
 export default function NavBar({ user, setUser }) {
-  const [loggedIn, setLoggedIn] = useState(getUser());
 
   function handleLogOut() {
     userService.logOut();
@@ -12,16 +9,22 @@ export default function NavBar({ user, setUser }) {
   }
 
   return (
-    <nav>
-      <Link to="/premium">PREMIUM</Link>
-      &nbsp;&nbsp;
-      {loggedIn ? <Link to="/karaoke">KARAOKE</Link> : <Link to="/discover">DISCOVER</Link>}
-      &nbsp;&nbsp;
-      <Link to="/support">SUPPORT</Link>
-      &nbsp;&nbsp;
-      <Link to="/blog">BLOG</Link>
-      &nbsp;&nbsp;
-      <Link to="/contact">CONTACT</Link>
+    <nav className="flex space-x-6 text-gray-700">
+      <Link to="/premium" className="hover:text-blue-500">PREMIUM</Link>
+      {user ? (
+        <>
+          <Link to="/karaoke" className="hover:text-blue-500">KARAOKE</Link>
+          <Link to="/" onClick={handleLogOut} className="hover:text-red-500">LOG OUT</Link>
+        </>
+      ) : (
+        <>
+          <Link to="/discover" className="hover:text-blue-500">DISCOVER</Link>
+          <Link to="/authpage" className="hover:text-blue-500">LOGIN</Link>
+        </>
+      )}
+      <Link to="/support" className="hover:text-blue-500">SUPPORT</Link>
+      <Link to="/blog" className="hover:text-blue-500">BLOG</Link>
+      <Link to="/contact" className="hover:text-blue-500">CONTACT</Link>
     </nav>
   );
 }
