@@ -19,7 +19,6 @@ export default function NavBar({ user, setUser }) {
       ) : (
         <>
           <Link to="/discover" className="hover:text-blue-500">DISCOVER</Link>
-          <Link to="/authpage" className="hover:text-blue-500">LOGIN</Link>
         </>
       )}
       <Link to="/support" className="hover:text-blue-500">SUPPORT</Link>
