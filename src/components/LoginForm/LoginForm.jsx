@@ -29,8 +29,7 @@ export default function LoginForm({ setUser }) {
 
   return (
     <div className="flex justify-center items-center">
-      <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold mb-6 text-center">Log In</h2>
+      <div className="w-full max-w-md bg-white p-8">
         <form autoComplete="off" onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-700">Email</label>

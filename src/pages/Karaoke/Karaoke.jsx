@@ -28,13 +28,13 @@ export default function Karaoke() {
         navigate('/karaoke/new');
     }
 
-    function handleSearchChange(e) {
-        setSearchTerm(e.target.value);
+    function handleSearchChange(evt) {
+        setSearchTerm(evt.target.value);
     }
 
     return (
         <div className="max-w-4xl mx-auto mt-8 p-4">
-            <h2 className="text-2xl font-semibold mb-6">Join in for Karaoke</h2>
+            <h2 className="text-2xl font-semibold flex justify-center">Join in for Karaoke</h2>
             <p className="text-center text-gray-600 mb-4">Join your friends or jump into a public room, you're always welcome.</p>
 
             <div className="flex justify-between items-center mb-8">
@@ -45,15 +45,18 @@ export default function Karaoke() {
                     onChange={handleSearchChange}
                     className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+
+            </div>
+
+            <div className="flex justify-between">
+                <h3 className="text-lg font-medium px-4 py-2">Public Rooms</h3>
                 <button
                     onClick={handleCreateRoom}
-                    className="ml-4 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600"
+                    className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600"
                 >
                     Create Room
                 </button>
             </div>
-
-            <h3 className="text-lg font-medium mb-4">Public Rooms</h3>
 
             {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 

@@ -9,7 +9,7 @@ export default function Header({ user, setUser }) {
                     LOGO HERE
                 </span>
                 <NavBar user={user} setUser={setUser} />
-                <div id="right-button">
+                <div className="flex justify-center">
                     {user ? (
                         <Link to="/" className="text-white bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg">
                             SING NOW

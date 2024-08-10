@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import LoginForm from '../../components/LoginForm/LoginForm';
 import SignUpForm from '../../components/SignUpForm/SignUpForm';
 
@@ -15,16 +16,18 @@ export default function AuthPage({ setUser }) {
               {showLogin ? 'Log in now to start singing!' : 'Join us and start your singing journey!'}
             </p>
             {showLogin ? <LoginForm setUser={setUser} /> : <SignUpForm setUser={setUser} />}
-            <div className="flex justify-center">
-              <div className="flex justify-between items-center mb-1">
+            <div className="flex justify-center items-center mb-1">
+              <div className="flex justify-between items-center">
                 <button
                   onClick={() => setShowLogin(!showLogin)}
                   className="text-blue-500 hover:underline focus:outline-none"
                 >
-                  {showLogin ? "Don't have an account? Sign Up" : "Already have an account? Log In"}
+                  {showLogin ? "Don't have an account?" : "Already have an account? Log In"}
                 </button>
-                {showLogin && (
-                  <a href="#" className="text-gray-500 hover:underline">Forgot your password?</a>
+              </div>
+              <div className="ml-4">
+              {showLogin && (
+                  <Link to="#" className="text-gray-500 hover:underline">Forgot your password?</Link>
                 )}
               </div>
             </div>

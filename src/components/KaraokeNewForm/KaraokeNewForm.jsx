@@ -29,7 +29,7 @@ export default function KaraokeNewForm() {
                         type="text"
                         id="sessionName"
                         value={sessionName}
-                        onChange={(e) => setSessionName(e.target.value)}
+                        onChange={(evt) => setSessionName(evt.target.value)}
                         required
                         className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />

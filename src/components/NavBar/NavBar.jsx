@@ -9,7 +9,7 @@ export default function NavBar({ user, setUser }) {
   }
 
   return (
-    <nav className="flex space-x-6 text-gray-700">
+    <nav className="hidden md:flex space-x-6 text-gray-700">
       <Link to="/premium" className="hover:text-blue-500">PREMIUM</Link>
       {user ? (
         <>
