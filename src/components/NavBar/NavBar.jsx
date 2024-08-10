@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import * as userService from '../../utilities/users-service';
+import { getUser } from '../../utilities/users-service';
 
 export default function NavBar({ user, setUser }) {
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(getUser());
 
   function handleLogOut() {
     userService.logOut();

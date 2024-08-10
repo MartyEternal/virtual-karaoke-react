@@ -3,22 +3,31 @@ import { Routes, Route } from 'react-router-dom';
 import './App.css';
 import { getUser } from '../../utilities/users-service';
 import AuthPage from '../AuthPage/AuthPage';
-import NewOrderPage from '../NewOrderPage/NewOrderPage';
-import OrderHistoryPage from '../OrderHistoryPage/OrderHistoryPage';
-import NavBar from '../../components/NavBar/NavBar';
+import Blog from '../Blog/Blog';
+import Contact from '../Contact/Contact';
+import Discover from '../Discover/Discover';
 import Header from '../../components/Header/Header';
+import Karaoke from '../Karaoke/Karaoke';
+import Premium from '../Premium/Premium';
+import Support from '../Support/Support';
 
 export default function App() {
   const [user, setUser] = useState(getUser()); // need to figure out getUser()
+
   return (
     <main className="App">
-      { user ?
+      <Header user={user} setUser={setUser} />
+      <Routes>
+        <Route path="/premium" element={<Premium />} />
+        <Route path="/discover" element={<Discover />} />
+        <Route path="/support" element={<Support />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/contact" element={<Contact />} />
+      </Routes>
+      {user ?
         <>
-          <Header user={user} setUser={setUser} />
           <Routes>
-            {/* client-side route that renders the component instance if the path matches the url in the address bar */}
-            <Route path="/orders/new" element={<NewOrderPage />} />
-            <Route path="/orders" element={<OrderHistoryPage />} />
+            <Route path="/" element={<Karaoke />} />
           </Routes>
         </>
         :
