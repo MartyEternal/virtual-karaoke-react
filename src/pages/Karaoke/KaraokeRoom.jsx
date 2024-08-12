@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import sendRequest from '../../utilities/send-request';
+import { updateRoomName } from '../../utilities/karaoke-service';
 
 export default function KaraokeRoom() {
     const { id } = useParams();
     const [room, setRoom] = useState(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [newRoomName, setNewRoomName] = useState('');
     const [playlist, setPlaylist] = useState([]);
     const [view, setView] = useState('playlist'); // toggle defaults to playlist
     const [currentSong, setCurrentSong] = useState(null);
@@ -15,12 +18,15 @@ export default function KaraokeRoom() {
         async function fetchRoom() {
             try {
                 const fetchedRoom = await sendRequest(`/api/rooms/${id}`, 'GET');
+                console.log('Fetched Room:', fetchedRoom);
                 setRoom(fetchedRoom);
+                setNewRoomName(fetchedRoom.name);
                 setPlaylist(fetchedRoom.playlist || []);
                 if (fetchedRoom.playlist && fetchedRoom.playlist.length > 0) {
                     setCurrentSong(fetchedRoom.playlist[0]);
                 }
             } catch (err) {
+                console.error('Error fetching room:', err);
                 setError('Failed to load room data. Please try again later.');
             }
         }
@@ -37,7 +43,25 @@ export default function KaraokeRoom() {
     }
 
     function handleEditRoomName() {
-        // space for editing room name
+        if (isEditing && room) {
+            updateRoomName(room._id, newRoomName)
+                .then(updatedRoom => {
+                    setRoom(updatedRoom);
+                })
+                .catch(error => {
+                    console.error('Error updating room name:', error);
+                });
+        }
+        setIsEditing(!isEditing);
+    }
+
+    function handleNameChange(evt) {
+        return setNewRoomName(evt.target.value);
+    }
+
+    function handleCancelEdit() {
+        setIsEditing(false);
+        setNewRoomName(room.name);
     }
 
     function handleSongSearch() {
@@ -45,6 +69,12 @@ export default function KaraokeRoom() {
     }
 
     return (
+        //     <div>
+        //         <h2>Debug Info</h2>
+        //         <p>Room Name: {room?.name || 'No room data'}</p>
+        //         <p>Room ID: {room?._id || 'No room ID'}</p>
+        //     </div>
+
         <div className="flex flex-col md:flex-row max-w-6xl mx-auto mt-8 p-4">
             {/* Main Video Section */}
             <div className="w-full md:w-3/4 p-4">
@@ -74,10 +104,39 @@ export default function KaraokeRoom() {
             {/* Right Section */}
             <div className="w-full md:w-1/4 p-4">
                 <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-xl font-semibold">{room?.name || 'Room Name'}</h3>
-                    <button onClick={handleEditRoomName} className="text-blue-500 hover:text-blue-600">
-                        ✏️
-                    </button>
+                    {isEditing ? (
+                        <input
+                            type="text"
+                            value={newRoomName}
+                            onChange={handleNameChange}
+                            className="border rounded p-1 w-full"
+                        />
+                    ) : (
+                        <h3 className="text-xl font-semibold">{room?.name || 'Room Name'}</h3>
+                    )}
+                    {isEditing ? (
+                        <div>
+                            <button
+                                onClick={handleEditRoomName}
+                                className="text-green-500 hover:text-green-600 mr-2"
+                            >
+                                Save
+                            </button>
+                            <button
+                                onClick={handleCancelEdit}
+                                className="text-red-500 hover: text-red-600"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    ) : (
+                        <button
+                            onClick={() => setIsEditing(true)}
+                            className="text-blue-500 hover:text-blue-600"
+                        >
+                            ✏️
+                        </button>
+                    )}
                 </div>
                 <div className="mb-4">
                     <button

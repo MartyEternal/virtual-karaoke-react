@@ -2,7 +2,9 @@ const Room = require('../../models/room');
 
 module.exports = {
     getRooms,
-    createRoom
+    getRoomById,
+    createRoom,
+    updateRoomName,
 };
 
 async function getRooms(req, res) {
@@ -14,6 +16,22 @@ async function getRooms(req, res) {
     }
 }
 
+async function getRoomById(req, res) {
+    try {
+        const roomId = req.params.id;
+        const room = await Room.findById(roomId).populate('host', 'username').populate('users', 'username');
+
+        if (!room) {
+            return res.status(404).json({ error: 'Room not found' });
+        }
+
+        res.json(room);
+    } catch (err) {
+        console.error('Error fetching room by ID:', err);
+        res.status(500).json({ error: 'Failed to fetch room' });
+    }
+}
+
 async function createRoom(req, res) {
     try {
         const { name } = req.body;
@@ -21,7 +39,7 @@ async function createRoom(req, res) {
 
         const newRoom = new Room({
             name,
-            host: req.user._id,  
+            host: req.user._id,
             users: [req.user._id]
         });
 
@@ -30,5 +48,27 @@ async function createRoom(req, res) {
         res.status(201).json(room);
     } catch (err) {
         res.status(500).json({ error: 'Something went wrong' });
+    }
+}
+
+async function updateRoomName(req, res) {
+    try {
+        const roomId = req.params.id;
+        const newName = req.body.name;
+
+        const updatedRoom = await Room.findByIdAndUpdate(
+            roomId,
+            { name: newName },
+            { new: true }
+        );
+
+        if (!updatedRoom) {
+            return res.status(404).json({ error: 'Room not found' });
+        }
+
+        res.json(updatedRoom);
+    } catch (err) {
+        console.error('Error updating room name:', err);
+        res.status(500).json({ error: 'Failed to update room name' });
     }
 }
