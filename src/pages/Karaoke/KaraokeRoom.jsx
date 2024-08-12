@@ -3,7 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import sendRequest from '../../utilities/send-request';
 import { updateRoomName, deleteRoom } from '../../utilities/karaoke-service';
 
-export default function KaraokeRoom() {
+
+export default function KaraokeRoom({ user }) {
     const { id } = useParams();
     const [room, setRoom] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
@@ -32,7 +33,7 @@ export default function KaraokeRoom() {
             }
         }
         fetchRoom();
-    }, [id]);
+    }, [id, room?.host._id]);
 
     function handleToggleView() {
         setView(view === 'playlist' ? 'people' : 'playlist');
@@ -142,12 +143,14 @@ export default function KaraokeRoom() {
                             </button>
                         </div>
                     ) : (
-                        <button
-                            onClick={() => setIsEditing(true)}
-                            className="text-blue-500 hover:text-blue-600"
-                        >
-                            ✏️
-                        </button>
+                        user && user._id === room?.host._id && (
+                            <button
+                                onClick={() => setIsEditing(true)}
+                                className="text-blue-500 hover:text-blue-600"
+                            >
+                                ✏️
+                            </button>
+                        )
                     )}
                 </div>
                 <div className="mb-4">
@@ -189,12 +192,14 @@ export default function KaraokeRoom() {
                 >
                     Invite
                 </button>
-                <button
-                    onClick={handleDeleteRoom}
-                    className="w-full py-2 px-4 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600"
-                >
-                    Close
-                </button>
+                {user && user._id === room?.host._id && (
+                    <button
+                        onClick={handleDeleteRoom}
+                        className="w-full py-2 px-4 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600"
+                    >
+                        Close
+                    </button>
+                )}
             </div>
         </div>
     );

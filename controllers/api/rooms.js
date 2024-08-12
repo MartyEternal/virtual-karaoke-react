@@ -52,20 +52,45 @@ async function createRoom(req, res) {
     }
 }
 
+// async function updateRoomName(req, res) {
+//     try {
+//         const roomId = req.params.id;
+//         const newName = req.body.name;
+
+//         const updatedRoom = await Room.findByIdAndUpdate(
+//             roomId,
+//             { name: newName },
+//             { new: true }
+//         );
+
+//         if (!updatedRoom) {
+//             return res.status(404).json({ error: 'Room not found' });
+//         }
+
+//         res.json(updatedRoom);
+//     } catch (err) {
+//         console.error('Error updating room name:', err);
+//         res.status(500).json({ error: 'Failed to update room name' });
+//     }
+// }
+
 async function updateRoomName(req, res) {
     try {
         const roomId = req.params.id;
         const newName = req.body.name;
 
-        const updatedRoom = await Room.findByIdAndUpdate(
-            roomId,
-            { name: newName },
-            { new: true }
-        );
+        const room = await Room.findById(roomId);
 
-        if (!updatedRoom) {
+        if (!room) {
             return res.status(404).json({ error: 'Room not found' });
         }
+
+        if (!room.host.equals(req.user._id)) {
+            return res.status(403).json({ error: 'You do not have permission to edit this room' });
+        }
+
+        room.name = newName;
+        const updatedRoom = await room.save();
 
         res.json(updatedRoom);
     } catch (err) {
@@ -75,13 +100,33 @@ async function updateRoomName(req, res) {
 }
 
 async function deleteRoom(req, res) {
+    // try {
+    //     const roomId = req.params.id;
+
+    //     const roomToDelete = await Room.findByIdAndDelete(roomId);
+    //     if (!roomToDelete) {
+    //         return res.status(404).json({ error: 'Room not found' });
+    //     }
+    //     res.status(200).json({ message: 'Room successfully deleted' });
+    // } catch (err) {
+    //     console.error('Error deleting room:', err);
+    //     res.status(500).json({ error: 'Failed to delete room' });
+    // }
+
     try {
         const roomId = req.params.id;
 
-        const roomToDelete = await Room.findByIdAndDelete(roomId);
-        if (!roomToDelete) {
+        const room = await Room.findById(roomId);
+
+        if (!room) {
             return res.status(404).json({ error: 'Room not found' });
         }
+
+        if (!room.host.equals(req.user._id)) {
+            return res.status(403).json({ error: 'You do not have permission to close this room' });
+        }
+
+        await Room.findByIdAndDelete(roomId);
         res.status(200).json({ message: 'Room successfully deleted' });
     } catch (err) {
         console.error('Error deleting room:', err);

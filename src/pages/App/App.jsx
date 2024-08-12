@@ -21,9 +21,9 @@ export default function App() {
       <Routes>
         {user ? (
           <>
-            <Route path="/" element={user ? <Karaoke /> : <Navigate to="/authpage" />} />
-            <Route path="/karaoke/new" element={user ? <KaraokeNewRoom /> : <AuthPage setUser={setUser} />} />
-            <Route path="/karaoke/:id" element={user ? <KaraokeRoom /> : <AuthPage setUser={setUser} />} />
+            <Route path="/" element={user ? <Karaoke user={user} /> : <Navigate to="/authpage" />} />
+            <Route path="/karaoke/new" element={user ? <KaraokeNewRoom user={user} /> : <AuthPage setUser={setUser} />} />
+            <Route path="/karaoke/:id" element={user ? <KaraokeRoom user={user} /> : <AuthPage setUser={setUser} />} />
             {/* <Route path="/karaoke/:id/search" element={user ? <SongSearchUI /> : <AuthPage setUser={setUser} />} /> */}
             <Route path="/premium" element={<Premium />} />
             <Route path="/discover" element={<Discover />} />
