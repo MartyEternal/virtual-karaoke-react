@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import sendRequest from '../../utilities/send-request';
-import { updateRoomName } from '../../utilities/karaoke-service';
+import { updateRoomName, deleteRoom } from '../../utilities/karaoke-service';
 
 export default function KaraokeRoom() {
     const { id } = useParams();
     const [room, setRoom] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [newRoomName, setNewRoomName] = useState('');
+    const [isDelete, setIsDelete] = useState(false);
     const [playlist, setPlaylist] = useState([]);
     const [view, setView] = useState('playlist'); // toggle defaults to playlist
     const [currentSong, setCurrentSong] = useState(null);
@@ -62,6 +63,17 @@ export default function KaraokeRoom() {
     function handleCancelEdit() {
         setIsEditing(false);
         setNewRoomName(room.name);
+    }
+
+    async function handleDeleteRoom() {
+        if (room && window.confirm('Are you sure you want to delete this room?')) {
+            try {
+                await deleteRoom(room._id);
+                navigate('/karaoke');
+            } catch (error) {
+                console.error('Error deleting room:', error);
+            }
+        }
     }
 
     function handleSongSearch() {
@@ -176,6 +188,12 @@ export default function KaraokeRoom() {
                     className="mt-4 w-full py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600"
                 >
                     Invite
+                </button>
+                <button
+                    onClick={handleDeleteRoom}
+                    className="w-full py-2 px-4 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600"
+                >
+                    Close
                 </button>
             </div>
         </div>

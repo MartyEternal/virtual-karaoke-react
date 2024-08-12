@@ -5,6 +5,7 @@ module.exports = {
     getRoomById,
     createRoom,
     updateRoomName,
+    deleteRoom,
 };
 
 async function getRooms(req, res) {
@@ -70,5 +71,20 @@ async function updateRoomName(req, res) {
     } catch (err) {
         console.error('Error updating room name:', err);
         res.status(500).json({ error: 'Failed to update room name' });
+    }
+}
+
+async function deleteRoom(req, res) {
+    try {
+        const roomId = req.params.id;
+
+        const roomToDelete = await Room.findByIdAndDelete(roomId);
+        if (!roomToDelete) {
+            return res.status(404).json({ error: 'Room not found' });
+        }
+        res.status(200).json({ message: 'Room successfully deleted' });
+    } catch (err) {
+        console.error('Error deleting room:', err);
+        res.status(500).json({ error: 'Failed to delete room' });
     }
 }
