@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import sendRequest from '../../utilities/send-request';
 import { updateRoomName, deleteRoom } from '../../utilities/karaoke-service';
+import useSocket from '../../hooks/useSocket';
 
 
 export default function KaraokeRoom({ user }) {
+    // const { id: roomId } = useParams();
     const { id } = useParams();
     const [room, setRoom] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
@@ -15,6 +17,7 @@ export default function KaraokeRoom({ user }) {
     const [currentSong, setCurrentSong] = useState(null);
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    useSocket(id);
 
     useEffect(() => {
         async function fetchRoom() {

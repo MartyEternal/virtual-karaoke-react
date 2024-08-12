@@ -9,6 +9,42 @@ require('./config/database');
 
 const app = express();
 
+// socket.io stuff
+const { createServer } = require('http');
+const { Server } = require('socket.io');
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"]
+  }
+});
+
+io.on('connection', (socket) => {
+  console.log('A user connected:', socket.id);
+
+  // listening for user joining a room
+  socket.on('joinRoom', (roomId) => {
+    socket.join(roomId); // adds user to a specific room
+    console.log(`User ${socket.id} joined room ${roomId}`);
+
+    // tell others in the room that a new user has joined
+    socket.to(roomId).emit('userJoined', { userId: socket.id, roomId });
+  });
+
+  socket.on('disconnect', () => {
+    console.log('A user disconnected:', socket.id);
+  });
+
+  socket.on('leaveRoom', (roomId) => {
+    socket.leave(roomId);
+    console.log(`User ${socket.id} left room ${roomId}`);
+
+    // tell others in the room that a user left
+    socket.to(roomId).emit('userLeft', { userId: socket.id, roomId });
+  });
+});
+
 app.use(logger('dev'));
 app.use(express.json());
 
@@ -33,6 +69,6 @@ app.get('/*', function (req, res) {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-app.listen(port, function () {
+httpServer.listen(port, function () {
   console.log(`Express app running on port ${port}`);
 });
