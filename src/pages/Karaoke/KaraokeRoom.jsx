@@ -81,7 +81,7 @@ export default function KaraokeRoom({ user }) {
     }
 
     function handleSongSearch() {
-        navigate(`/karaoke/${id}/search`);
+        navigate(`/karaoke/${room._id}/search`);
     }
 
     return (
