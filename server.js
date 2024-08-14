@@ -28,6 +28,9 @@ io.on('connection', (socket) => {
   // Listening for user joining a room
   socket.on('joinRoom', async ({ roomId, userId }) => {
     try {
+      // Attach userId to socket for later use
+      socket.userId = userId;
+
       socket.join(roomId); // Adds user to a specific room
       console.log(`User ${userId} joined room ${roomId}`);
 
@@ -37,10 +40,7 @@ io.on('connection', (socket) => {
         room.users.push(userId);
         await room.save();
       }
-
-      // Attach userId to socket for later use
-      socket.userId = userId;
-
+      
       // Notify others in the room that a new user has joined
       socket.to(roomId).emit('userJoined', { userId, roomId });
     } catch (err) {
@@ -50,22 +50,24 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', async () => {
     try {
+      if (!socket.userId) {
+        console.warn('No userId found on socket, skipping disconnect handling');
+        return;
+      }
+
       console.log('A user disconnected:', socket.id);
 
-      // Retrieve the userId attached to the socket
-      const userId = socket.userId;
-
-      if (!userId) return;
-
       // Find the room that the user was in
-      const room = await Room.findOne({ users: userId });
+      const room = await Room.findOne({ users: socket.userId });
       if (room) {
         // Remove user from the room's user list
-        room.users = room.users.filter(id => id.toString() !== userId.toString());
+        room.users = room.users.filter(userId => userId && userId.toString() !== socket.userId);
         await room.save();
 
         // Notify others in the room that the user has left
-        socket.to(room._id).emit('userLeft', { userId, roomId: room._id });
+        socket.to(room._id).emit('userLeft', { userId: socket.userId, roomId: room._id });
+      } else {
+        console.warn('No room found for user during disconnect');
       }
     } catch (err) {
       console.error('Error during disconnection:', err);
@@ -74,13 +76,18 @@ io.on('connection', (socket) => {
 
   socket.on('leaveRoom', async ({ roomId, userId }) => {
     try {
+      if (!roomId || !userId) {
+        console.error('Missing roomId or userId in leaveRoom');
+        return;
+      }
+
       socket.leave(roomId);
       console.log(`User ${userId} left room ${roomId}`);
 
       // Update the room's user list in the database
       const room = await Room.findById(roomId);
       if (room) {
-        room.users = room.users.filter(id => id.toString() !== userId.toString());
+        room.users = room.users.filter(id => id && id.toString() !== userId);
         await room.save();
       }
 

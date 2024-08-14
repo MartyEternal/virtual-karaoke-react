@@ -7,7 +7,10 @@ export default function useSocket(roomId, userId) {
             ? 'https://virtual-karaoke-react.onrender.com'
             : 'http://localhost:3000';
 
-        const socket = io(socketUrl);
+        const socket = io(socketUrl, {
+            transports: ['websocket'],
+            reconnectionAttempts: 5,
+        });
 
         // join room when the hook is used
         // socket.emit('joinRoom', roomId);

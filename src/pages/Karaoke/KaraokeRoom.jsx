@@ -1,44 +1,29 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import sendRequest from '../../utilities/send-request';
+import { useKaraokeRoom } from '../../context/KaraokeRoomContext';
 import { updateRoomName, deleteRoom } from '../../utilities/karaoke-service';
 import useSocket from '../../hooks/useSocket';
 import SongSearchUI from './SongSearchUI';
 
-
 export default function KaraokeRoom({ user }) {
-    // const { id: roomId } = useParams();
     const { id } = useParams();
-    const [room, setRoom] = useState(null);
-    const [isEditing, setIsEditing] = useState(false);
-    const [newRoomName, setNewRoomName] = useState('');
-    const [isDelete, setIsDelete] = useState(false);
-    const [playlist, setPlaylist] = useState([]);
-    const [view, setView] = useState('playlist'); // toggle defaults to playlist
-    const [currentSong, setCurrentSong] = useState(null);
-    const [isSearching, setIsSearching] = useState(false);
-    const [error, setError] = useState('');
     const navigate = useNavigate();
-    useSocket(id, user._id);
+    const {
+        room,
+        setRoom,
+        newRoomName,
+        setNewRoomName,
+        updateRoomName,
+        playlist,
+        addSongToPlaylist,
+        currentSong,
+        setCurrentSong
+    } = useKaraokeRoom();
+    const [isEditing, setIsEditing] = useState(false);
+    const [isSearching, setIsSearching] = useState(false);
+    const [view, setView] = useState('playlist'); // Define state for view
 
-    useEffect(() => {
-        async function fetchRoom() {
-            try {
-                const fetchedRoom = await sendRequest(`/api/rooms/${id}`, 'GET');
-                console.log('Fetched Room:', fetchedRoom);
-                setRoom(fetchedRoom);
-                setNewRoomName(fetchedRoom.name);
-                setPlaylist(fetchedRoom.playlist || []);
-                if (fetchedRoom.playlist && fetchedRoom.playlist.length > 0) {
-                    setCurrentSong(fetchedRoom.playlist[0]);
-                }
-            } catch (err) {
-                console.error('Error fetching room:', err);
-                setError('Failed to load room data. Please try again later.');
-            }
-        }
-        fetchRoom();
-    }, [id]);
+    useSocket(id, user._id);
 
     function handleToggleView() {
         setView(view === 'playlist' ? 'people' : 'playlist');
@@ -46,25 +31,18 @@ export default function KaraokeRoom({ user }) {
 
     function handleCopyLink() {
         navigator.clipboard.writeText(window.location.href);
-        // will change this to a setInterval modal
         alert('Room link copied to clipboard!');
     }
 
     function handleEditRoomName() {
         if (isEditing && room) {
-            updateRoomName(room._id, newRoomName)
-                .then(updatedRoom => {
-                    setRoom(updatedRoom);
-                })
-                .catch(error => {
-                    console.error('Error updating room name:', error);
-                });
+            updateRoomName(newRoomName);
         }
         setIsEditing(!isEditing);
     }
 
     function handleNameChange(evt) {
-        return setNewRoomName(evt.target.value);
+        setNewRoomName(evt.target.value);
     }
 
     function handleCancelEdit() {
@@ -73,7 +51,6 @@ export default function KaraokeRoom({ user }) {
     }
 
     async function handleDeleteRoom() {
-        // will change this to modal that will pop up on center of KaraokeRoom
         if (room && window.confirm('Are you sure you want to delete this room?')) {
             try {
                 await deleteRoom(room._id);
@@ -85,15 +62,11 @@ export default function KaraokeRoom({ user }) {
     }
 
     function handleSongSearch() {
-        setIsSearching(true)
-        // navigate(`/karaoke/${room._id}/search`);
+        setIsSearching(true);
     }
 
     function handleVideoSelect(video) {
-        setPlaylist([...playlist, video]);
-        if (!currentSong) {
-            setCurrentSong(video);
-        }
+        addSongToPlaylist(video);
         setIsSearching(false);
     }
 
@@ -102,12 +75,6 @@ export default function KaraokeRoom({ user }) {
     }
 
     return (
-        //     <div>
-        //         <h2>Debug Info</h2>
-        //         <p>Room Name: {room?.name || 'No room data'}</p>
-        //         <p>Room ID: {room?._id || 'No room ID'}</p>
-        //     </div>
-
         <div className="flex flex-col md:flex-row max-w-6xl mx-auto mt-8 p-4">
             {/* Main Video Section */}
             <div className="w-full md:w-3/4 p-4">

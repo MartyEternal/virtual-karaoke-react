@@ -9,6 +9,7 @@ import Header from '../../components/Header/Header';
 import Karaoke from '../Karaoke/Karaoke';
 import KaraokeNewRoom from '../Karaoke/KaraokeNewRoom';
 import KaraokeRoom from '../Karaoke/KaraokeRoom';
+import { KaraokeRoomProvider } from '../../context/KaraokeRoomContext';
 import SongSearchUI from '../Karaoke/SongSearchUI';
 import Premium from '../Premium/Premium';
 import Support from '../Support/Support';
@@ -29,10 +30,17 @@ export default function App() {
         </>
         {user ? (
           <>
-            <Route path="/" element={user ? <Karaoke user={user} /> : <Navigate to="/authpage" />} />
-            <Route path="/karaoke/new" element={user ? <KaraokeNewRoom user={user} /> : <AuthPage setUser={setUser} />} />
-            <Route path="/karaoke/:id" element={user ? <KaraokeRoom user={user} /> : <AuthPage setUser={setUser} />} />
-            <Route path="/karaoke/:id/search" element={user ? <SongSearchUI /> : <Navigate to="/authpage" />} />
+            <Route path="/" element={<Karaoke user={user} />} />
+            <Route path="/karaoke/new" element={<KaraokeNewRoom user={user} />} />
+            <Route
+              path="/karaoke/:id"
+              element={
+                <KaraokeRoomProvider>
+                  <KaraokeRoom user={user} />
+                </KaraokeRoomProvider>
+              }
+            />
+            <Route path="/karaoke/:id/search" element={<SongSearchUI />} />
             <Route path="*" element={<Navigate to="/" />} />
           </>
         ) : (
