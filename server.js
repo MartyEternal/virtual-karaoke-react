@@ -6,11 +6,10 @@ const logger = require('morgan');
 require('dotenv').config();
 // Connect to the database
 require('./config/database');
-const { ObjectId } = require('mongoose');
 
 const app = express();
 
-// socket.io stuff
+// socket.io setup
 const { createServer } = require('http');
 const { Server } = require('socket.io');
 const httpServer = createServer(app);
@@ -22,63 +21,71 @@ const io = new Server(httpServer, {
 });
 
 const Room = require('./models/room');
-const { default: mongoose } = require('mongoose');
 
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
 
-  // listening for user joining a room
+  // Listening for user joining a room
   socket.on('joinRoom', async ({ roomId, userId }) => {
     try {
-      socket.join(roomId); // adds user to a specific room
-      console.log(`User ${socket.id} joined room ${roomId}`);
+      socket.join(roomId); // Adds user to a specific room
+      console.log(`User ${userId} joined room ${roomId}`);
 
-      // this will update room's user list in the database
+      // Update room's user list in the database
       const room = await Room.findById(roomId);
-      if (room) {
+      if (room && !room.users.includes(userId)) {
         room.users.push(userId);
         await room.save();
       }
-      // tell others in the room that a new user has joined
-      socket.to(roomId).emit('userJoined', { userId: socket.id, roomId });
+
+      // Attach userId to socket for later use
+      socket.userId = userId;
+
+      // Notify others in the room that a new user has joined
+      socket.to(roomId).emit('userJoined', { userId, roomId });
     } catch (err) {
       console.error('Error joining room:', err);
-    }// needs to update and query db from within this function, then copy to other socket functions
+    }
   });
 
   socket.on('disconnect', async () => {
     try {
       console.log('A user disconnected:', socket.id);
 
-      // room that the user was in
-      const room = await Room.findOne({ users: socket.id });
+      // Retrieve the userId attached to the socket
+      const userId = socket.userId;
+
+      if (!userId) return;
+
+      // Find the room that the user was in
+      const room = await Room.findOne({ users: userId });
       if (room) {
-        // take user out of room's user list
-        room.users = room.users.filter(userId => userId !== socket.id);
+        // Remove user from the room's user list
+        room.users = room.users.filter(id => id.toString() !== userId.toString());
         await room.save();
 
-        // tell others the user left the room
-        socket.to(room._id_.emit('userLeft', { userId: socket.id, roomId: room._id }));
+        // Notify others in the room that the user has left
+        socket.to(room._id).emit('userLeft', { userId, roomId: room._id });
       }
     } catch (err) {
       console.error('Error during disconnection:', err);
     }
   });
 
-  socket.on('leaveRoom', async (roomId) => {
+  socket.on('leaveRoom', async ({ roomId, userId }) => {
     try {
       socket.leave(roomId);
-      console.log(`User ${socket.id} left room ${roomId}`);
+      console.log(`User ${userId} left room ${roomId}`);
 
-      // updating room's user list in db
+      // Update the room's user list in the database
       const room = await Room.findById(roomId);
       if (room) {
-        room.users = room.users.filter(userId => userId !== socket.id);
+        room.users = room.users.filter(id => id.toString() !== userId.toString());
         await room.save();
       }
 
-      // tell others in the room that a user left
-      socket.to(roomId).emit('userLeft', { userId: socket.id, roomId });
+      // Notify others in the room that a user has left
+      socket.to(roomId).emit('userLeft', { userId, roomId });
     } catch (err) {
       console.error('Error leaving room:', err);
     }

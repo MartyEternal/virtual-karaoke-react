@@ -19,7 +19,7 @@ export default function KaraokeRoom({ user }) {
     const [isSearching, setIsSearching] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    useSocket(id, user.id);
+    useSocket(id, user._id);
 
     useEffect(() => {
         async function fetchRoom() {

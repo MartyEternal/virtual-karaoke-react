@@ -7,12 +7,7 @@ export default function useSocket(roomId, userId) {
 
         // join room when the hook is used
         // socket.emit('joinRoom', roomId);
-        socket.emit('joinRoom', 
-            {
-                userId: userId,
-                roomId: roomId
-            }
-        );
+        socket.emit('joinRoom',{ roomId, userId });
 
         // listening for events
         socket.on('userJoined', (data) => {
@@ -25,7 +20,7 @@ export default function useSocket(roomId, userId) {
 
         // remove socket connection when hook is no longer used
         return () => {
-            socket.emit('leaveRoom', roomId);
+            socket.emit('leaveRoom', roomId, userId);
             socket.disconnect();
         };
     }, [roomId]);
