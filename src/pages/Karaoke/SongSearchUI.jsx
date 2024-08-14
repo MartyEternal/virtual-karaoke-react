@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { searchKaraokeVideos } from "../../utilities/youtube-api";
 
-export default function SongSearchUI({ onVideoSelect }) {
+export default function SongSearchUI({ onVideoSelect, onBack }) {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
 
@@ -30,6 +30,13 @@ export default function SongSearchUI({ onVideoSelect }) {
                     className="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600"
                 >
                     Search
+                </button>
+                <button
+                type="button"
+                onClick={onBack}
+                className="w-full py-2 px-4 bg-gray-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-600"
+                >
+                    Back
                 </button>
             </form>
             <div className="mt-4 grid grid-cols-2 gap-4">

@@ -1,12 +1,18 @@
 import { useEffect } from "react";
 import io from 'socket.io-client';
 
-export default function useSocket(roomId) {
+export default function useSocket(roomId, userId) {
     useEffect(() => {
         const socket = io('http://localhost:3000');
 
         // join room when the hook is used
-        socket.emit('joinRoom', roomId);
+        // socket.emit('joinRoom', roomId);
+        socket.emit('joinRoom', 
+            {
+                userId: userId,
+                roomId: roomId
+            }
+        );
 
         // listening for events
         socket.on('userJoined', (data) => {

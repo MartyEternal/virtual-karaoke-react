@@ -6,6 +6,7 @@ const logger = require('morgan');
 require('dotenv').config();
 // Connect to the database
 require('./config/database');
+const { ObjectId } = require('mongoose');
 
 const app = express();
 
@@ -21,12 +22,13 @@ const io = new Server(httpServer, {
 });
 
 const Room = require('./models/room');
+const { default: mongoose } = require('mongoose');
 
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
 
   // listening for user joining a room
-  socket.on('joinRoom', async (roomId) => {
+  socket.on('joinRoom', async ({ roomId, userId }) => {
     try {
       socket.join(roomId); // adds user to a specific room
       console.log(`User ${socket.id} joined room ${roomId}`);
@@ -34,7 +36,7 @@ io.on('connection', (socket) => {
       // this will update room's user list in the database
       const room = await Room.findById(roomId);
       if (room) {
-        room.users.push(socket.id);
+        room.users.push(userId);
         await room.save();
       }
       // tell others in the room that a new user has joined

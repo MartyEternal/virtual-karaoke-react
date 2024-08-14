@@ -19,7 +19,7 @@ export default function KaraokeRoom({ user }) {
     const [isSearching, setIsSearching] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    useSocket(id);
+    useSocket(id, user.id);
 
     useEffect(() => {
         async function fetchRoom() {
@@ -97,6 +97,10 @@ export default function KaraokeRoom({ user }) {
         setIsSearching(false);
     }
 
+    function handleBack() {
+        setIsSearching(false);
+    }
+
     return (
         //     <div>
         //         <h2>Debug Info</h2>
@@ -108,7 +112,7 @@ export default function KaraokeRoom({ user }) {
             {/* Main Video Section */}
             <div className="w-full md:w-3/4 p-4">
                 {isSearching ? (
-                    <SongSearchUI onVideoSelect={handleVideoSelect} />
+                    <SongSearchUI onVideoSelect={handleVideoSelect} onBack={handleBack} />
                 ) : (
                     currentSong ? (
                         <iframe
