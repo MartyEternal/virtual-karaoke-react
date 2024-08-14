@@ -3,11 +3,15 @@ import io from 'socket.io-client';
 
 export default function useSocket(roomId, userId) {
     useEffect(() => {
-        const socket = io('http://localhost:3000');
+        const socketUrl = process.env.NODE_ENV === 'production'
+            ? 'https://virtual-karaoke-react.onrender.com'
+            : 'http://localhost:3000';
+
+        const socket = io(socketUrl);
 
         // join room when the hook is used
         // socket.emit('joinRoom', roomId);
-        socket.emit('joinRoom',{ roomId, userId });
+        socket.emit('joinRoom', { roomId, userId });
 
         // listening for events
         socket.on('userJoined', (data) => {
@@ -23,5 +27,5 @@ export default function useSocket(roomId, userId) {
             socket.emit('leaveRoom', roomId, userId);
             socket.disconnect();
         };
-    }, [roomId]);
+    }, [roomId, userId]);
 };

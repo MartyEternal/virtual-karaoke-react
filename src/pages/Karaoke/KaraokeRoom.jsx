@@ -38,7 +38,7 @@ export default function KaraokeRoom({ user }) {
             }
         }
         fetchRoom();
-    }, [id, room?.host._id]);
+    }, [id]);
 
     function handleToggleView() {
         setView(view === 'playlist' ? 'people' : 'playlist');
