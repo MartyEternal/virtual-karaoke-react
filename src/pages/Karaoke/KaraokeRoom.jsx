@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import sendRequest from '../../utilities/send-request';
 import { updateRoomName, deleteRoom } from '../../utilities/karaoke-service';
 import useSocket from '../../hooks/useSocket';
+import SongSearchUI from './SongSearchUI';
 
 
 export default function KaraokeRoom({ user }) {
@@ -15,6 +16,7 @@ export default function KaraokeRoom({ user }) {
     const [playlist, setPlaylist] = useState([]);
     const [view, setView] = useState('playlist'); // toggle defaults to playlist
     const [currentSong, setCurrentSong] = useState(null);
+    const [isSearching, setIsSearching] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
     useSocket(id);
@@ -44,6 +46,7 @@ export default function KaraokeRoom({ user }) {
 
     function handleCopyLink() {
         navigator.clipboard.writeText(window.location.href);
+        // will change this to a setInterval modal
         alert('Room link copied to clipboard!');
     }
 
@@ -70,6 +73,7 @@ export default function KaraokeRoom({ user }) {
     }
 
     async function handleDeleteRoom() {
+        // will change this to modal that will pop up on center of KaraokeRoom
         if (room && window.confirm('Are you sure you want to delete this room?')) {
             try {
                 await deleteRoom(room._id);
@@ -81,7 +85,16 @@ export default function KaraokeRoom({ user }) {
     }
 
     function handleSongSearch() {
-        navigate(`/karaoke/${room._id}/search`);
+        setIsSearching(true)
+        // navigate(`/karaoke/${room._id}/search`);
+    }
+
+    function handleVideoSelect(video) {
+        setPlaylist([...playlist, video]);
+        if (!currentSong) {
+            setCurrentSong(video);
+        }
+        setIsSearching(false);
     }
 
     return (
@@ -94,20 +107,23 @@ export default function KaraokeRoom({ user }) {
         <div className="flex flex-col md:flex-row max-w-6xl mx-auto mt-8 p-4">
             {/* Main Video Section */}
             <div className="w-full md:w-3/4 p-4">
-                {currentSong ? (
-                    <iframe
-                        width="100%"
-                        height="400"
-                        src={`https://www.youtube.com/embed/${currentSong.youtubeUrl}`}
-                        title={currentSong.title}
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                    ></iframe>
+                {isSearching ? (
+                    <SongSearchUI onVideoSelect={handleVideoSelect} />
                 ) : (
-                    <div className="flex items-center justify-center h-96 bg-gray-200">
-                        <p>No song selected</p>
-                    </div>
+                    currentSong ? (
+                        <iframe
+                            width="100%"
+                            height="400"
+                            src={`https://www.youtube.com/embed/${currentSong.youtubeUrl}`}
+                            title={currentSong.title}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                        ></iframe>
+                    ) : (
+                        <div className="flex items-center justify-center h-96 bg-gray-200">
+                            <p>No song selected</p>
+                        </div>
+                    )
                 )}
                 <button
                     onClick={handleSongSearch}

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { searchKaraokeVideos } from "../../utilities/youtube-api";
 
-export default function SongSearchUI() {
+export default function SongSearchUI({ onVideoSelect }) {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
 
@@ -32,7 +32,25 @@ export default function SongSearchUI() {
                     Search
                 </button>
             </form>
-            <div className="mt-4">
+            <div className="mt-4 grid grid-cols-2 gap-4">
+                {results.map((video) => (
+                    <div
+                        key={video.id.videoId}
+                        className="cursor-pointer"
+                        onClick={() => onVideoSelect({
+                            youtubeUrl: video.id.videoId,
+                            title: video.snippet.title
+                        })}
+                    >
+                        <img
+                            src={video.snippet.thumbnails.medium.url}
+                            alt={video.snippet.title}
+                        />
+                        <p>{video.snippet.title}</p>
+                    </div>
+                ))}
+            </div>
+            {/* <div className="mt-4">
                 {results.length > 0 ? (
                     <ul>
                         {results.map((video) => (
@@ -46,7 +64,7 @@ export default function SongSearchUI() {
                 ) : (
                     <p>No results found</p>
                 )}
-            </div>
-        </div>
+            </div> */}
+        </div >
     );
 }
