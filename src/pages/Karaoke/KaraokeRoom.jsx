@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useKaraokeRoom } from '../../context/KaraokeRoomContext';
-import { updateRoomName, deleteRoom } from '../../utilities/karaoke-service';
+import { deleteRoom } from '../../utilities/karaoke-service';
 import useSocket from '../../hooks/useSocket';
 import SongSearchUI from './SongSearchUI';
 
@@ -67,10 +67,7 @@ export default function KaraokeRoom({ user }) {
     }
 
     function handleVideoSelect(video) {
-        setPlaylist([...playlist, video]);
-        if (!currentSong) {
-            setCurrentSong(video);
-        }
+        addSongToPlaylist(video)
         setIsSearching(false);
     }
 
@@ -202,15 +199,19 @@ export default function KaraokeRoom({ user }) {
                                         {index + 1}. {song.title}
                                     </div>
                                     <div className="flex">
-                                        <button onClick={() => handleMoveSongUp(index)} disabled={index === 0}>
-                                            ▲
-                                        </button>
-                                        <button onClick={() => handleMoveSongDown(index)} disabled={index === playlist.length - 1}>
-                                            ▼
-                                        </button>
-                                        <button onClick={() => handleDeleteSong(index)} className="text-red-500 ml-2">
-                                            🗑️
-                                        </button>
+                                        {user && user._id === room?.host._id && (
+                                            <>
+                                                <button onClick={() => handleMoveSongUp(index)} disabled={index === 0}>
+                                                    ▲
+                                                </button>
+                                                <button onClick={() => handleMoveSongDown(index)} disabled={index === playlist.length - 1}>
+                                                    ▼
+                                                </button>
+                                                <button onClick={() => handleDeleteSong(index)} className="text-red-500 ml-2">
+                                                    🗑️
+                                                </button>
+                                            </>
+                                        )}
                                     </div>
                                 </li>
                             ))}

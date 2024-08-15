@@ -32,8 +32,16 @@ export function KaraokeRoomProvider({ children }) {
         fetchRoom();
     }, [roomId]);
 
+    function addSongToPlaylist(video) {
+        const updatedPlaylist = [...playlist, video];
+        setPlaylist(updatedPlaylist);
+        if (!currentSong) {
+            setCurrentSong(video);
+        }
+    }
+
     return (
-        <KaraokeRoomContext.Provider value={{ room, setRoom, newRoomName, setNewRoomName, playlist, setPlaylist, currentSong, setCurrentSong }}>
+        <KaraokeRoomContext.Provider value={{ room, setRoom, newRoomName, setNewRoomName, playlist, setPlaylist, currentSong, setCurrentSong, addSongToPlaylist }}>
             {children}
         </KaraokeRoomContext.Provider>
     );

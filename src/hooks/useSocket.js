@@ -1,7 +1,10 @@
 import { useEffect } from "react";
 import io from 'socket.io-client';
+import { useKaraokeRoom } from "../context/KaraokeRoomContext";
 
 export default function useSocket(roomId, userId) {
+    const { setRoom } = useKaraokeRoom();
+
     useEffect(() => {
         const socketUrl = process.env.NODE_ENV === 'production'
             ? 'https://virtual-karaoke-react.onrender.com'
@@ -16,6 +19,10 @@ export default function useSocket(roomId, userId) {
         // socket.emit('joinRoom', roomId);
         socket.emit('joinRoom', { roomId, userId });
 
+        socket.on('roomUpdated', (updatedRoom) => {
+            setRoom(updatedRoom);
+        });
+
         // listening for events
         socket.on('userJoined', (data) => {
             console.log(`User ${data.userId} joined the room ${data.roomId}`);
@@ -23,6 +30,9 @@ export default function useSocket(roomId, userId) {
 
         socket.on('userLeft', (data) => {
             console.log(`User ${data.userId} left room ${data.roomId}`);
+            if (data.newHost) {
+                setRoom(prevRoom => ({ ...prevRoom, host: data.newHost }))
+            }
         });
 
         // remove socket connection when hook is no longer used
