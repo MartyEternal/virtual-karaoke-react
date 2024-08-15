@@ -15,6 +15,7 @@ export default function KaraokeRoom({ user }) {
         setNewRoomName,
         updateRoomName,
         playlist,
+        setPlaylist,
         addSongToPlaylist,
         currentSong,
         setCurrentSong
@@ -66,12 +67,47 @@ export default function KaraokeRoom({ user }) {
     }
 
     function handleVideoSelect(video) {
-        addSongToPlaylist(video);
+        setPlaylist([...playlist, video]);
+        if (!currentSong) {
+            setCurrentSong(video);
+        }
         setIsSearching(false);
     }
 
     function handleBack() {
         setIsSearching(false);
+    }
+
+    function handleMoveSongUp(index) {
+        if (index > 0) {
+            const newPlaylist = [...playlist];
+            [newPlaylist[index - 1], newPlaylist[index]] = [newPlaylist[index], newPlaylist[index - 1]];
+            setPlaylist(newPlaylist);
+            if (index - 1 === 0) {
+                setCurrentSong(newPlaylist[0]);
+            }
+        }
+    }
+
+    function handleMoveSongDown(index) {
+        if (index < playlist.length - 1) {
+            const newPlaylist = [...playlist];
+            [newPlaylist[index + 1], newPlaylist[index]] = [newPlaylist[index], newPlaylist[index + 1]];
+            setPlaylist(newPlaylist);
+            if (index + 1 === 0) {
+                setCurrentSong(newPlaylist[0]);
+            }
+        }
+    }
+
+    function handleDeleteSong(index) {
+        const newPlaylist = playlist.filter((_, i) => i !== index);
+        setPlaylist(newPlaylist);
+        if (index === 0 && newPlaylist.length > 0) {
+            setCurrentSong(newPlaylist[0]);
+        } else if (newPlaylist.length === 0) {
+            setCurrentSong(null); // Clear the current song if the playlist is empty
+        }
     }
 
     return (
@@ -161,8 +197,21 @@ export default function KaraokeRoom({ user }) {
                     {view === 'playlist' ? (
                         <ul>
                             {playlist.map((song, index) => (
-                                <li key={index} className="mb-2">
-                                    {index + 1}. {song.title}
+                                <li key={index} className="mb-2 flex items-center justify-between">
+                                    <div>
+                                        {index + 1}. {song.title}
+                                    </div>
+                                    <div className="flex">
+                                        <button onClick={() => handleMoveSongUp(index)} disabled={index === 0}>
+                                            ▲
+                                        </button>
+                                        <button onClick={() => handleMoveSongDown(index)} disabled={index === playlist.length - 1}>
+                                            ▼
+                                        </button>
+                                        <button onClick={() => handleDeleteSong(index)} className="text-red-500 ml-2">
+                                            🗑️
+                                        </button>
+                                    </div>
                                 </li>
                             ))}
                         </ul>
