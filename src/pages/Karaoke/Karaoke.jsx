@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import sendRequest from '../../utilities/send-request';
+import io from 'socket.io-client';
 
 export default function Karaoke() {
     const [rooms, setRooms] = useState([]);
@@ -18,6 +19,31 @@ export default function Karaoke() {
             }
         }
         fetchRooms();
+
+        const socketUrl = process.env.NODE_ENV === 'production'
+            ? 'https://virtual-karaoke-react.onrender.com'
+            : 'http://localhost:3001';
+
+        const socket = io(socketUrl, {
+            transports: ['websocket'],
+            reconnectionAttempts: 5,
+        });
+
+        socket.on('roomUpdated', (updatedRoom) => {
+            setRooms(prevRooms => {
+                const index = prevRooms.findIndex(room => room._id === updatedRoom._id);
+                if (index !== -1) {
+                    const updatedRooms = [...prevRooms];
+                    updatedRooms[index] = updatedRoom;
+                    return updatedRooms;
+                }
+                return prevRooms;
+            });
+        });
+
+        return () => {
+            socket.disconnect();
+        };
     }, []);
 
     const filteredRooms = rooms.filter(room =>

@@ -1,6 +1,7 @@
 import { createContext, useState, useContext, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import sendRequest from '../utilities/send-request';
+import { addSongToPlaylist as addSongToPlaylistService } from '../utilities/karaoke-service';
 
 const KaraokeRoomContext = createContext();
 
@@ -22,9 +23,6 @@ export function KaraokeRoomProvider({ children }) {
                 setRoom(fetchedRoom);
                 setNewRoomName(fetchedRoom.name);
                 setPlaylist(fetchedRoom.playlist || []);
-                // if (fetchedRoom.playlist && fetchedRoom.playlist.length > 0) {
-                //     setCurrentSong(fetchedRoom.playlist[0]);
-                // }
                 setCurrentSong(fetchedRoom.currentSong || (fetchedRoom.playlist && fetchedRoom.playlist[0]));
             } catch (err) {
                 console.error('Error fetching room:', err);
@@ -34,13 +32,8 @@ export function KaraokeRoomProvider({ children }) {
     }, [roomId]);
 
     async function addSongToPlaylist(video) {
-        // const updatedPlaylist = [...playlist, video];
-        // setPlaylist(updatedPlaylist);
-        // if (!currentSong) {
-        //     setCurrentSong(video);
-        // }
         try {
-            const updatedRoom = await sendRequest(`/api/playlists/add`, 'POST', { roomId, video })
+            const updatedRoom = await addSongToPlaylistService(roomId, video);
             setRoom(updatedRoom);
             setPlaylist(updatedRoom.playlist);
             if (!currentSong) {
@@ -52,7 +45,17 @@ export function KaraokeRoomProvider({ children }) {
     }
 
     return (
-        <KaraokeRoomContext.Provider value={{ room, setRoom, newRoomName, setNewRoomName, playlist, setPlaylist, currentSong, setCurrentSong }}>
+        <KaraokeRoomContext.Provider value={{
+            room,
+            setRoom,
+            newRoomName,
+            setNewRoomName,
+            playlist,
+            setPlaylist,
+            currentSong,
+            setCurrentSong,
+            addSongToPlaylist,
+        }}>
             {children}
         </KaraokeRoomContext.Provider>
     );

@@ -6,28 +6,48 @@ module.exports = {
     addSongToPlaylistView,
 }
 
-async function addSongToPlaylistView(roomId, songData) {
-    const room = await Room.findById(roomId).populate('playlist').populate('currentSong');
-    if (!room) throw new Error('Room not found');
+async function addSongToPlaylistView(req, res) {
+    const { roomId, video } = req.body;
 
-    let song = await Song.findOne({ youtubeUrl: songData.youtubeUrl });
-    if (!song) {
-        song = new Song(songData);
-        await song.save();
+    try {
+        let song = await Song.findOne({ youtubeUrl: video.youtubeUrl });
+        if (!song) {
+            song = new Song(video);
+            await song.save();
+        }
+
+        const room = await Room.findById(roomId).populate('playlist');
+        if (!room) return res.status(404).json({ error: 'Room not found' });
+
+        const nextPosition = room.playlist.length;
+
+        const playlistEntry = new Playlist({
+            room: roomId,
+            song: song._id,
+            position: nextPosition
+        });
+
+        await playlistEntry.save();
+
+        room.playlist.push(playlistEntry._id);
+        if (!room.currentSong) {
+            room.currentSong = song._id;
+        }
+        await room.save();
+
+        // const populatedRoom = await Room.findById(roomId).populate('playlist song').populate('currentSong');
+        const populatedRoom = await Room.findById(roomId)
+            .populate({
+                path: 'playlist',
+                populate: { path: 'song' }
+            })
+            .populate('currentSong');
+
+        req.io.to(roomId).emit('roomUpdated', populatedRoom);
+
+        res.json(populatedRoom);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
     }
-
-    const nextPosition = room.playlist.length;
-
-    const playlistEntry = new Playlist({
-        room: roomId,
-        song: song._id,
-        position: nextPosition
-    });
-    await playlistEntry.save();
-
-    room.playlist.push(playlistEntry._id);
-    await room.save();
-
-    return await Room.findById(roomId).populate('playlist').populate('currentSong');
 }
-

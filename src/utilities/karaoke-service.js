@@ -9,3 +9,7 @@ export function updateRoomName(id, newName) {
 export function deleteRoom(id) {
     return sendRequest(`${BASE_URL}/${id}`, 'DELETE');
 }
+
+export function addSongToPlaylist(roomId, video) {
+    return sendRequest(`/api/playlists/add`, 'POST', { roomId, video });
+}

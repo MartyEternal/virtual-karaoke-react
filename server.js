@@ -61,7 +61,7 @@ io.on('connection', (socket) => {
 
         io.to(roomId).emit('roomUpdated', populatedRoom);
       }
-      
+
       // Notify others in the room that a new user has joined
       socket.to(roomId).emit('userJoined', { userId, roomId });
     } catch (err) {
@@ -129,6 +129,10 @@ io.on('connection', (socket) => {
 
 app.use(logger('dev'));
 app.use(express.json());
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
 
 // Configure both serve-favicon & static middleware
 // to serve from the production 'build' folder
