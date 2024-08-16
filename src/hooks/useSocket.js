@@ -5,7 +5,7 @@ export default function useSocket(roomId, userId) {
     useEffect(() => {
         const socketUrl = process.env.NODE_ENV === 'production'
             ? 'https://virtual-karaoke-react.onrender.com'
-            : 'http://localhost:3000';
+            : 'http://localhost:3001';
 
         const socket = io(socketUrl, {
             transports: ['websocket'],

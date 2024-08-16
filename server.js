@@ -21,6 +21,7 @@ const io = new Server(httpServer, {
 });
 
 const Room = require('./models/room');
+const User = require('./models/user');
 
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
@@ -39,7 +40,10 @@ io.on('connection', (socket) => {
       if (room && !room.users.includes(userId)) {
         room.users.push(userId);
         await room.save();
-        io.to(roomId).emit('roomUpdated', room);
+
+        const populatedRoom = await Room.findById(roomId).populate('users', 'username');
+
+        io.to(roomId).emit('roomUpdated', populatedRoom);
       }
       
       // Notify others in the room that a new user has joined
@@ -65,6 +69,9 @@ io.on('connection', (socket) => {
         room.users = room.users.filter(userId => userId && userId.toString() !== socket.userId);
         await room.save();
 
+        const populatedRoom = await Room.findById(room._id).populate('users', 'username');
+
+        io.to(room._id).emit('roomUpdated', populatedRoom);
         // Notify others in the room that the user has left
         socket.to(room._id).emit('userLeft', { userId: socket.userId, roomId: room._id });
       } else {
@@ -90,7 +97,10 @@ io.on('connection', (socket) => {
       if (room) {
         room.users = room.users.filter(id => id && id.toString() !== userId);
         await room.save();
-        io.to(roomId).emit('roomUpdated', room);
+
+        const populatedRoom = await Room.findById(roomId).populate('users', 'username');
+
+        io.to(roomId).emit('roomUpdated', populatedRoom);
       }
 
       // Notify others in the room that a user has left

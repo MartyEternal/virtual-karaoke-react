@@ -13,7 +13,7 @@ export default function NavBar({ user, setUser }) {
       <Link to="/premium" className="hover:text-blue-500">PREMIUM</Link>
       {user ? (
         <>
-          <Link to="/karaoke" className="hover:text-blue-500">KARAOKE</Link>
+          <Link to="/karaoke" className="hover:text-blue-500">{user.displayName}</Link>
           <Link to="/" onClick={handleLogOut} className="hover:text-red-500">LOG OUT</Link>
         </>
       ) : (
