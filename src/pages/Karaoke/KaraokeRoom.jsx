@@ -66,26 +66,27 @@ export default function KaraokeRoom({ user }) {
         setIsSearching(true);
     }
 
-    // function handleVideoSelect(video) {
-    //     setPlaylist([...playlist, video]);
-    //     if (!currentSong) {
-    //         setCurrentSong(video);
-    //     }
-    //     setIsSearching(false);
-    // }
-
-    async function handleVideoSelect(video) {
-        try {
-            const updatedRoom = await addSongToPlaylist(id, video);
-            setRoom(updatedRoom);
-            setPlaylist(updatedRoom.playlist);
-            if (!currentSong) {
-                setCurrentSong(updatedRoom.currentSong || video);
-            }
-        } catch (err) {
-            console.error('Error adding song to playlist:', err);
+    function handleVideoSelect(video) {
+        setPlaylist([...playlist, video]);
+        if (!currentSong) {
+            setCurrentSong(video);
         }
+        setIsSearching(false);
     }
+
+    // async function handleVideoSelect(video) {
+    //     console.log('Received video object:', video);
+    //     try {
+    //         const updatedRoom = await addSongToPlaylist(id, video);
+    //         setRoom(updatedRoom);
+    //         setPlaylist(updatedRoom.playlist);
+    //         if (!currentSong) {
+    //             setCurrentSong(updatedRoom.currentSong || video);
+    //         }
+    //     } catch (err) {
+    //         console.error('Error adding song to playlist:', err);
+    //     }
+    // }
 
     function handleBack() {
         setIsSearching(false);
