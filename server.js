@@ -38,16 +38,12 @@ io.on('connection', (socket) => {
       const room = await Room.findById(roomId);
       if (room && !room.users.includes(userId)) {
         room.users.push(userId);
-        if (!room.host) {
-          room.host = userId;
-        }
         await room.save();
         io.to(roomId).emit('roomUpdated', room);
       }
-
+      
       // Notify others in the room that a new user has joined
       socket.to(roomId).emit('userJoined', { userId, roomId });
-      io.to(roomId).emit('roomUpdated', room);
     } catch (err) {
       console.error('Error joining room:', err);
     }
@@ -67,16 +63,10 @@ io.on('connection', (socket) => {
       if (room) {
         // Remove user from the room's user list
         room.users = room.users.filter(userId => userId && userId.toString() !== socket.userId);
-
-        if (room.host.toString() === socket.userId) {
-          room.host = room.users.length > 0 ? room.users[0] : null;
-        }
-
         await room.save();
 
         // Notify others in the room that the user has left
-        io.to(room._id).emit('userLeft', { userId: socket.userId, roomId: room._id, newHost: room.host });
-        io.to(room._id).emit('roomUpdated', room);
+        socket.to(room._id).emit('userLeft', { userId: socket.userId, roomId: room._id });
       } else {
         console.warn('No room found for user during disconnect');
       }
@@ -99,18 +89,12 @@ io.on('connection', (socket) => {
       const room = await Room.findById(roomId);
       if (room) {
         room.users = room.users.filter(id => id && id.toString() !== userId);
-
-        if (room.host.toString() === userId) {
-          room.host = room.users.length > 0 ? room.users[0] : null;
-        }
-
         await room.save();
         io.to(roomId).emit('roomUpdated', room);
       }
 
       // Notify others in the room that a user has left
-      io.to(roomId).emit('userLeft', { userId, roomId, newHost: room.host });
-      io.to(roomId).emit('roomUpdated', room);
+      socket.to(roomId).emit('userLeft', { userId, roomId });
     } catch (err) {
       console.error('Error leaving room:', err);
     }

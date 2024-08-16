@@ -52,7 +52,7 @@ export function KaraokeRoomProvider({ children }) {
     }
 
     return (
-        <KaraokeRoomContext.Provider value={{ room, setRoom, newRoomName, setNewRoomName, playlist, setPlaylist, currentSong, setCurrentSong, addSongToPlaylist }}>
+        <KaraokeRoomContext.Provider value={{ room, setRoom, newRoomName, setNewRoomName, playlist, setPlaylist, currentSong, setCurrentSong }}>
             {children}
         </KaraokeRoomContext.Provider>
     );
