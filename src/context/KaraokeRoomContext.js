@@ -1,7 +1,7 @@
 import { createContext, useState, useContext, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import sendRequest from '../utilities/send-request';
-import { addSongToPlaylist as addSongToPlaylistService } from '../utilities/karaoke-service';
+import { addSongToPlaylist as addSongToPlaylistService, updateRoomName as updateRoomNameService } from '../utilities/karaoke-service';
 
 const KaraokeRoomContext = createContext();
 
@@ -44,6 +44,16 @@ export function KaraokeRoomProvider({ children }) {
         }
     }
 
+    async function updateRoomName(newName) {
+        try {
+            const updatedRoom = await updateRoomNameService(roomId, newName);
+            setRoom(updatedRoom);
+            setNewRoomName(updatedRoom.name);
+        } catch (err) {
+            console.error('Error updating room name:', err);
+        }
+    }
+
     return (
         <KaraokeRoomContext.Provider value={{
             room,
@@ -55,6 +65,7 @@ export function KaraokeRoomProvider({ children }) {
             currentSong,
             setCurrentSong,
             addSongToPlaylist,
+            updateRoomName,
         }}>
             {children}
         </KaraokeRoomContext.Provider>
