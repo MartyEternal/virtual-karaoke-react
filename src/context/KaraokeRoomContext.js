@@ -22,9 +22,10 @@ export function KaraokeRoomProvider({ children }) {
                 setRoom(fetchedRoom);
                 setNewRoomName(fetchedRoom.name);
                 setPlaylist(fetchedRoom.playlist || []);
-                if (fetchedRoom.playlist && fetchedRoom.playlist.length > 0) {
-                    setCurrentSong(fetchedRoom.playlist[0]);
-                }
+                // if (fetchedRoom.playlist && fetchedRoom.playlist.length > 0) {
+                //     setCurrentSong(fetchedRoom.playlist[0]);
+                // }
+                setCurrentSong(fetchedRoom.currentSong || (fetchedRoom.playlist && fetchedRoom.playlist[0]));
             } catch (err) {
                 console.error('Error fetching room:', err);
             }
@@ -32,11 +33,21 @@ export function KaraokeRoomProvider({ children }) {
         fetchRoom();
     }, [roomId]);
 
-    function addSongToPlaylist(video) {
-        const updatedPlaylist = [...playlist, video];
-        setPlaylist(updatedPlaylist);
-        if (!currentSong) {
-            setCurrentSong(video);
+    async function addSongToPlaylist(video) {
+        // const updatedPlaylist = [...playlist, video];
+        // setPlaylist(updatedPlaylist);
+        // if (!currentSong) {
+        //     setCurrentSong(video);
+        // }
+        try {
+            const updatedRoom = await sendRequest(`/api/playlists/add`, 'POST', { roomId, video })
+            setRoom(updatedRoom);
+            setPlaylist(updatedRoom.playlist);
+            if (!currentSong) {
+                setCurrentSong(updatedRoom.currentSong || video);
+            }
+        } catch (err) {
+            console.error('Error adding song to playlist:', err);
         }
     }
 

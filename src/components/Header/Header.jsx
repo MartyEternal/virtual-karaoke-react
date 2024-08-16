@@ -6,7 +6,7 @@ export default function Header({ user, setUser }) {
         <header className="bg-white shadow-md">
             <div className="container mx-auto flex justify-between items-center py-4 px-6">
                 <span id="logo" className="text-2xl font-bold text-gray-900">
-                    <img src="../../../public/K-APP.png" />
+                    <img src="/K-APP.png" alt="Logo Here" className="w-24" />
                 </span>
                 <NavBar user={user} setUser={setUser} />
                 <div className="flex justify-center">

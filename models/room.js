@@ -15,6 +15,15 @@ const roomSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }],
+    playlist: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Playlist'
+    }],
+    currentSong: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Song',
+        default: null,
+    },
     createdAt: {
         type: Date,
         default: Date.now

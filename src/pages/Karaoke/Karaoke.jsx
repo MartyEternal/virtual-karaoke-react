@@ -45,14 +45,13 @@ export default function Karaoke() {
                     onChange={handleSearchChange}
                     className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-
             </div>
 
             <div className="flex justify-between">
-                <h3 className="text-lg font-medium px-4 py-2">Public Rooms</h3>
+                <h3 className="mb-2 text-lg font-medium px-4 py-2">Public Rooms</h3>
                 <button
                     onClick={handleCreateRoom}
-                    className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600"
+                    className="mb-2 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600"
                 >
                     Create Room
                 </button>
@@ -66,8 +65,8 @@ export default function Karaoke() {
                         <Link to={`/karaoke/${room._id}`} key={room._id}>
                             <div key={room._id} className="p-4 bg-white shadow-md rounded-lg cursor-pointer hover:bg-gray-100">
                                 <h3 className="text-lg font-medium">{room.name}</h3>
-                                <p className="text-sm text-gray-500">Current Song: {room.currentSong || 'N/A'}</p>
-                                <p className="text-sm text-gray-500">People: {room.participantsCount || 0}</p>
+                                <p className="text-sm text-gray-500">Current Song: {room.currentSong?.title || 'N/A'}</p>
+                                <p className="text-sm text-gray-500">People: {room.users.length || 0}</p>
                             </div>
                         </Link>
                     ))}

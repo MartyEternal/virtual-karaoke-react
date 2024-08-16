@@ -42,6 +42,7 @@ io.on('connection', (socket) => {
           room.host = userId;
         }
         await room.save();
+        io.to(roomId).emit('roomUpdated', room);
       }
 
       // Notify others in the room that a new user has joined
@@ -104,6 +105,7 @@ io.on('connection', (socket) => {
         }
 
         await room.save();
+        io.to(roomId).emit('roomUpdated', room);
       }
 
       // Notify others in the room that a user has left
@@ -132,6 +134,7 @@ const port = process.env.PORT || 3001;
 // Put API routes here, before the "catch all" route
 app.use('/api/rooms', require('./routes/api/rooms'));
 app.use('/api/users', require('./routes/api/users'));
+app.use('/api/playlists', require('./routes/api/playlists'));
 
 // The following "catch all" route (note the *) is necessary
 // to return the index.html on all non-AJAX/API requests
