@@ -22,6 +22,22 @@ const io = new Server(httpServer, {
 
 const Room = require('./models/room');
 const User = require('./models/user');
+const MAX_RETRIES = 3;
+
+async function saveRoomRetries(room, retries = 0) {
+  try {
+    await room.save();
+  } catch (err) {
+    if (err.name === 'VersionError' && retries < MAX_RETRIES) {
+      console.warn(`Version conflict detected. Retrying save operation... Attempt ${retries + 1}`);
+      const freshRoom = await Room.findById(room._id);
+      freshRoom.users = room.users;
+      return saveRoomRetries(freshRoom, retries + 1);
+    } else {
+      throw err;
+    }
+  }
+}
 
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
@@ -39,7 +55,7 @@ io.on('connection', (socket) => {
       const room = await Room.findById(roomId);
       if (room && !room.users.includes(userId)) {
         room.users.push(userId);
-        await room.save();
+        await saveRoomRetries(room);
 
         const populatedRoom = await Room.findById(roomId).populate('users', 'username');
 
@@ -53,27 +69,27 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('disconnect', async () => {
+  socket.on('disconnect', async ({ roomId, userId }) => {
     try {
       if (!socket.userId) {
         console.warn('No userId found on socket, skipping disconnect handling');
         return;
       }
 
-      console.log('A user disconnected:', socket.id);
+      console.log('A user disconnected:', socket.userId);
 
       // Find the room that the user was in
       const room = await Room.findOne({ users: socket.userId });
       if (room) {
         // Remove user from the room's user list
         room.users = room.users.filter(userId => userId && userId.toString() !== socket.userId);
-        await room.save();
+        await saveRoomRetries(room);;
 
-        const populatedRoom = await Room.findById(room._id).populate('users', 'username');
+        const populatedRoom = await Room.findById(roomId).populate('users', 'username');
 
-        io.to(room._id).emit('roomUpdated', populatedRoom);
+        io.to(roomId).emit('roomUpdated', populatedRoom);
         // Notify others in the room that the user has left
-        socket.to(room._id).emit('userLeft', { userId: socket.userId, roomId: room._id });
+        socket.to(roomId).emit('userLeft', { userId: userId, roomId: roomId });
       } else {
         console.warn('No room found for user during disconnect');
       }
@@ -96,7 +112,7 @@ io.on('connection', (socket) => {
       const room = await Room.findById(roomId);
       if (room) {
         room.users = room.users.filter(id => id && id.toString() !== userId);
-        await room.save();
+        await saveRoomRetries(room);
 
         const populatedRoom = await Room.findById(roomId).populate('users', 'username');
 
