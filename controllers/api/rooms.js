@@ -50,31 +50,7 @@ async function createRoom(req, res) {
     } catch (err) {
         res.status(500).json({ error: 'Something went wrong' });
     }
-}
-
-// async function updateRoomName(req, res) {
-//     try {
-//         const roomId = req.params.id;
-//         const newName = req.body.name;
-
-//         const updatedRoom = await Room.findByIdAndUpdate(
-//             roomId,
-//             { name: newName },
-//             { new: true }
-//         );
-
-//         if (!updatedRoom) {
-//             return res.status(404).json({ error: 'Room not found' });
-//         }
-
-//         res.json(updatedRoom);
-//     } catch (err) {
-//         console.error('Error updating room name:', err);
-//         res.status(500).json({ error: 'Failed to update room name' });
-//     }
-// }
-
-async function updateRoomName(req, res) {
+}async function updateRoomName(req, res) {
     try {
         const roomId = req.params.id;
         const newName = req.body.name;
@@ -99,21 +75,7 @@ async function updateRoomName(req, res) {
     }
 }
 
-async function deleteRoom(req, res) {
-    // try {
-    //     const roomId = req.params.id;
-
-    //     const roomToDelete = await Room.findByIdAndDelete(roomId);
-    //     if (!roomToDelete) {
-    //         return res.status(404).json({ error: 'Room not found' });
-    //     }
-    //     res.status(200).json({ message: 'Room successfully deleted' });
-    // } catch (err) {
-    //     console.error('Error deleting room:', err);
-    //     res.status(500).json({ error: 'Failed to delete room' });
-    // }
-
-    try {
+async function deleteRoom(req, res) {try {
         const roomId = req.params.id;
 
         const room = await Room.findById(roomId);

@@ -26,7 +26,7 @@ export default function AuthPage({ setUser }) {
                 </button>
               </div>
               <div className="ml-4">
-              {showLogin && (
+                {showLogin && (
                   <Link to="#" className="text-gray-500 hover:underline">Forgot your password?</Link>
                 )}
               </div>

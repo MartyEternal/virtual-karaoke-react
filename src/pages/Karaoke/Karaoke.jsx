@@ -20,6 +20,7 @@ export default function Karaoke() {
         }
         fetchRooms();
 
+        // unfortunately, trying to make the KaraokeRoomContext component more broad wasn't successful
         const socketUrl = process.env.NODE_ENV === 'production'
             ? 'https://virtual-karaoke-react.onrender.com'
             : 'http://localhost:3001';

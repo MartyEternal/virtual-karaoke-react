@@ -46,7 +46,6 @@ async function addSongToPlaylistView(req, res) {
         }
         await room.save();
 
-        // const populatedRoom = await Room.findById(roomId).populate('playlist song').populate('currentSong');
         const populatedRoom = await Room.findById(roomId)
             .populate({
                 path: 'playlist',

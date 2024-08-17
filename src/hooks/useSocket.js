@@ -16,7 +16,6 @@ export default function useSocket(roomId, userId) {
         });
 
         // join room when the hook is used
-        // socket.emit('joinRoom', roomId);
         socket.emit('joinRoom', { roomId, userId });
 
         // this baby will listen for changes in the room
