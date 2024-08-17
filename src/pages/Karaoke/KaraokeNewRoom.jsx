@@ -18,6 +18,10 @@ export default function KaraokeNewRoom() {
         }
     }
 
+    function handleBack() {
+        navigate('/');
+    }
+
     return (
         <div className="max-w-md mx-auto mt-8 p-4 shadow-lg rounded-lg bg-white">
             <h2 className="text-xl font-semibold mb-4">Create New Karaoke Room</h2>
@@ -56,6 +60,13 @@ export default function KaraokeNewRoom() {
                     className="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600"
                 >
                     Create Room
+                </button>
+                <button
+                    type="button"
+                    onClick={handleBack}
+                    className="mt-1 w-full py-2 px-4 bg-gray-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-600"
+                >
+                    Back
                 </button>
             </form>
         </div>
